@@ -23,8 +23,7 @@ for j in range(0, num_seqs):  # Start line at random place and grow longer from 
     magnitude = int(random(1, 5)) # Determines magnitude of line growth
 
     for i in range(0, seq_length):
-        line(endpt_x[0] - traj_x * magnitude, endpt_y[0] - traj_y * magnitude, endpt_x[0], endpt_y[0])
-        line(endpt_x[1], endpt_y[1], endpt_x[1] + traj_x * magnitude, endpt_y[1] + traj_y * magnitude)
         endpt_x = [endpt_x[0] - traj_x * magnitude, endpt_x[1] + traj_x * magnitude]
         endpt_y = [endpt_y[0] - traj_y * magnitude,  endpt_y[1] + traj_y * magnitude]
+        line(endpt_x[0], endpt_y[0], endpt_x[1], endpt_y[1])
         save("{}/{}_{}.png".format(dir_path,j,i))
