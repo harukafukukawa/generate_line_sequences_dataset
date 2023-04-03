@@ -4,34 +4,49 @@ size(256, 256)
 background(0)
 stroke(255)
 
-dir_path = "/tmp/simple_line" # Make sure these directories are created in advance
-seq_length = 10 # number of images in a sequence
-num_seqs = 500 # number of total sequences
-line_widens = False
-if line_widens:
-    dir_path = "/tmp/simple_line_widens" 
+"""
+Dataset options:
+    1. One line that gets longer by a constant length on both ends and stays the same random width throughout sequence
+    2. One line that gets longer by a constant length on both ends and also gets wider by a constant amount
+    3. Multiple lines that follow the rules of option 1
+    4. Multiple lines that follow the rules of option 2
+"""
+
+dataset_num = 1 # See options above
+dir_path = "/tmp/lines_{}".format(str(dataset_num))
+
+seq_length = 10 # number o f images in a sequence
+num_seqs = 10 # number of total sequences
+
+line_widens = True
+if dataset_num % 2 == 0:
+    line_widens = True
 
 for j in range(0, num_seqs):  # Start line at random place and grow longer from both ends
-    start_x = random(img_width)
-    start_y = random(img_height)
-    traj_x = int(random(-10, 10))
-    traj_y = int(random(-10, 10))
+    xys = []
+    trajs = []
+    stroke_weights = []
+    line_coords = []
+    line_widen_amts = []
     background(0)
-    stroke_weight = random(0, 10)
-    strokeWeight(stroke_weight)
-    magnitude = int(random(1, 10)) # Determines length of initial line
-    endpt_x = [start_x, start_x + traj_x * magnitude]
-    endpt_y = [start_y, start_y + traj_y * magnitude]
-    line(endpt_x[0], endpt_y[0] , endpt_x[1], endpt_y[1])
-    magnitude = int(random(1, 5)) # Determines magnitude of line growth
-    line_width_magnitude = random(0, 1)
+    num_lines = int(random(1,5))
+    for i in range(num_lines):
+        xys.append([random(img_width), random(img_height)])
+        trajs.append([int(random(-10, 10)), int(random(-10, 10))])
+        stroke_weights.append(random(0, 10))
+        line_coords.append([xys[i][0], xys[i][1], xys[i][0] + trajs[i][0], xys[i][1] + trajs[i][1]]) # coords are: x1, y1, x2, y2
+        line_widen_amts.append(random(0, 1))
+        strokeWeight(stroke_weights[i])
+        line(*line_coords[i])
 
     for i in range(0, seq_length):
         background(0)
-        endpt_x = [endpt_x[0] - traj_x * magnitude, endpt_x[1] + traj_x * magnitude]
-        endpt_y = [endpt_y[0] - traj_y * magnitude,  endpt_y[1] + traj_y * magnitude]
-        if line_widens:
-            stroke_weight += line_width_magnitude
-            strokeWeight(stroke_weight)
-        line(endpt_x[0], endpt_y[0], endpt_x[1], endpt_y[1])
+        for l in range(num_lines):
+            coords = line_coords[l]
+            traj = trajs[l]
+            line_coords[l] = [coords[0] - traj[0], coords[1] - traj[1], coords[2] + traj[0], coords[3] + traj[1]]
+            if line_widens:
+                stroke_weights[l] += line_widen_amts[l]
+            strokeWeight(stroke_weights[l])
+            line(*line_coords[l])
         save("{}/{}_{}.png".format(dir_path,j,i))
