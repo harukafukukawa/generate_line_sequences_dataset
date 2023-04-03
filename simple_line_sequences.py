@@ -1,6 +1,6 @@
-img_height = 256
-img_width = 256
-size(256, 256)
+img_height = 128
+img_width = 128
+size(128, 128)
 background(0)
 stroke(255)
 
@@ -15,10 +15,12 @@ Dataset options:
 dataset_num = 1 # See options above
 dir_path = "/tmp/lines_{}".format(str(dataset_num))
 
-seq_length = 10 # number o f images in a sequence
-num_seqs = 10 # number of total sequences
+futuregan_fmt = False
 
-line_widens = True
+seq_length = 6 # number o f images in a sequence
+num_seqs = 500 # number of total sequences
+
+line_widens = False
 if dataset_num % 2 == 0:
     line_widens = True
 
@@ -29,12 +31,13 @@ for j in range(0, num_seqs):  # Start line at random place and grow longer from 
     line_coords = []
     line_widen_amts = []
     background(0)
-    num_lines = int(random(1,5))
+    num_lines = int(random(1,5)) if dataset_num > 2 else 1
     for i in range(num_lines):
         xys.append([random(img_width), random(img_height)])
         trajs.append([int(random(-10, 10)), int(random(-10, 10))])
-        stroke_weights.append(random(0, 10))
-        line_coords.append([xys[i][0], xys[i][1], xys[i][0] + trajs[i][0], xys[i][1] + trajs[i][1]]) # coords are: x1, y1, x2, y2
+        init_len = int(random(1, 10))
+        stroke_weights.append(random(1, 10))
+        line_coords.append([xys[i][0], xys[i][1], xys[i][0] + trajs[i][0] * init_len, xys[i][1] + trajs[i][1] * init_len]) # coords are: x1, y1, x2, y2
         line_widen_amts.append(random(0, 1))
         strokeWeight(stroke_weights[i])
         line(*line_coords[i])
@@ -49,4 +52,11 @@ for j in range(0, num_seqs):  # Start line at random place and grow longer from 
                 stroke_weights[l] += line_widen_amts[l]
             strokeWeight(stroke_weights[l])
             line(*line_coords[l])
-        save("{}/{}_{}.png".format(dir_path,j,i))
+        if futuregan_fmt == True:
+            # Create test/train sets in the format expected for FutureGAN
+            if j < num_seqs * .2:
+                save("{}/test/{}/{}.png".format(dir_path,j,i)) # No need to shuffle train/test set because the lines are generated randomly
+            else:
+                save("{}/train/{}/{}.png".format(dir_path,j,i))
+        else:
+            save("{}/{}_{}.png".format(dir_path,j,i))
