@@ -1,3 +1,4 @@
+# This is intended to be run within the Processing framework IDE. For more info check out: https://processing.org
 img_height = 128
 img_width = 128
 size(128, 128)
@@ -17,7 +18,7 @@ dir_path = "/tmp/lines_{}".format(str(dataset_num))
 
 futuregan_fmt = False
 
-seq_length = 6 # number o f images in a sequence
+seq_length = 6 # number of images in a sequence
 num_seqs = 500 # number of total sequences
 
 line_widens = False
